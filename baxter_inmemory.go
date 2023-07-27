@@ -2,6 +2,7 @@ package baxter
 
 import (
 	"context"
+	"encoding/json"
 	"sync"
 )
 
@@ -93,7 +94,7 @@ func (inst *inMemory) getAndDispatch() {
 		// Dispatch to all
 		for j := range inst.subs {
 			if inst.subs[j].eventName == latestEvent.eventName {
-				inst.subs[j].callback(latestEvent.eventName, string(latestEvent.meta))
+				inst.subs[j].callback(latestEvent.eventName, latestEvent.meta)
 			}
 		}
 	}
@@ -103,9 +104,9 @@ func (inst *inMemory) Stop() {
 	inst.cancelFunc()
 }
 
-func (inst *inMemory) Publish(event string, meta string) {
+func (inst *inMemory) Publish(event string, meta json.RawMessage) {
 	// I have to publish. My life depends on it!
 	inst.events.Push(Event{
-		event, []byte(meta),
+		event, meta,
 	})
 }

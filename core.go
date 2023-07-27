@@ -25,7 +25,7 @@ type BaxterProvider interface {
 	Start() error
 	Stop()
 	Subscribe(event string, subHandler EventProcessorSignature)
-	Publish(event string, meta string)
+	Publish(event string, meta json.RawMessage)
 }
 
 // Init
@@ -63,7 +63,7 @@ func Stop() {
 	instance.Stop()
 }
 
-type EventProcessorSignature func(event string, meta string)
+type EventProcessorSignature func(event string, meta json.RawMessage)
 
 func Subscribe(event string, subHandler EventProcessorSignature) {
 	if instance == nil {
@@ -72,7 +72,7 @@ func Subscribe(event string, subHandler EventProcessorSignature) {
 	instance.Subscribe(event, subHandler)
 }
 
-func Publish(event string, meta string) {
+func Publish(event string, meta json.RawMessage) {
 	// I have to publish. My life depends on it!
 	if instance == nil {
 		log.Fatalln(standardComplaint)
