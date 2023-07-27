@@ -1,11 +1,26 @@
 package baxter
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 )
 
-type Store interface {
+type Subscriber struct {
+	eventName string
+	callback  EventProcessorSignature
+}
+
+type Event struct {
+	eventName string
+	meta      json.RawMessage
+}
+
+func (evt Event) IsEmpty() bool {
+	return evt.eventName == "" && evt.meta == nil
+}
+
+type BaxterProvider interface {
 	Init() error
 	Start() error
 	Stop()
@@ -16,7 +31,7 @@ type Store interface {
 // Init
 // The one magic thing I do is catch SIGINT and call stop on our instance
 // TODO: add magic
-func Init(f func() Store) error {
+func Init(f func() BaxterProvider) error {
 	s := f()
 	err := s.Init()
 	if err != nil {
@@ -28,7 +43,7 @@ func Init(f func() Store) error {
 
 var (
 	// instance is a singleton. You don't want multiple baxters.
-	instance          Store
+	instance          BaxterProvider
 	standardComplaint = "baxter: You haven't called Init() -- and if you did, it errored"
 )
 

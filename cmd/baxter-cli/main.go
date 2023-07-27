@@ -9,9 +9,14 @@ import (
 
 func main() {
 
-	baxter.Init(baxter.InMemory()) // We can pass in different backing stores for our queue management
+	baxter.Init(baxter.InMemory(10)) // We can pass in different backing stores for our queue management
 
 	baxter.Subscribe("event.test", ProcessEvent)
+	baxter.Subscribe("event.test", func(event, meta string) {
+		log.Println("I AM THE GREATEST", meta)
+		time.Sleep(4 * time.Second)
+		baxter.Publish("event.test", "OMG NO")
+	})
 
 	baxter.Start()
 
